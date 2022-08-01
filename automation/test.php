@@ -24,119 +24,98 @@
 
 <body>
     <div class="bs-example">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="page-header clearfix">
-                        <h2 class="pull-left">Users List</h2>
-                        <button>Export XLS</button> <button>Email to Distributor</button>
-                    </div>
-                    <?php
-include_once 'db.php';
+    <div class="container">
+    <div class="row">
+    <div class="col-md-12">
+    <div class="page-header clearfix">
+    <h2 class="pull-left">Users List</h2>
+    <button>Export XLS</button> <button>Email to Distributor</button>
+    </div>
 
-$result = mysqli_query($conn,"SELECT * FROM ospos_people");
+
+<?php
+include_once 'db.php';
+$result = mysqli_query($conn, "SELECT * FROM `ospos_people` INNER JOIN `ospos_items` ON `ospos_people`.`person_id` = `ospos_items`.`supplier_id`");
 ?>
-                    <?php
+<?php
 if (mysqli_num_rows($result) > 0) {
 ?>
-                    <table class='table table-bordered table-striped'>
-                        <tr>
-                            <td>Name</td>
-                            <td>Email id</td>
-                            <td>Mobile</td>
-                        </tr>
-                        <?php
-$i=0;
-while($row = mysqli_fetch_array($result)) {
+<table class='table table-bordered table-striped'>
+    <tr>
+        <td>Name</td>
+        <td>Email id</td>
+        <td>Supplier ID</td>
+        <td>Item Name</td>
+        <td>Quantity Remaining</td>
+    </tr>
+<?php $i = 0;
+    while ($row = mysqli_fetch_array($result)) {
 ?>
-                        <tr>
-                            <td><?php echo $row["first_name"]; ?></td>
-                            <td><?php echo $row["email"]; ?></td>
-                            <td><?php echo $row["phone_number"]; ?></td>
-                        </tr>
-                        <?php
-$i++;
+    <tr>
+        <td><?php echo $row["first_name"]; ?></td>
+        <td><?php echo $row["email"]; ?></td>
+        <td><?php echo $row["supplier_id"]; ?></td>
+        <td><?php echo $row["name"]; ?></td>
+        <td><?php echo $row["category"]; ?></td>
+    </tr>
+<?php $i++;
+    }
+?>
+    </table>
+<?php
+}
+else {
+    echo "No result found";
 }
 ?>
-                    </table>
-                    <?php
-}
-else{
-echo "No result found";
-}
-?>
-                </div>
-            </div>
+</div>
+    </div>
         </div>
     </div>
 
 
     <div class="bs-example">
         <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="page-header clearfix">
-                        <h2 class="pull-left">Distributors Sales List</h2>
-                    </div>
-                    <?php
+        <div class="row">
+        <div class="col-md-12">
+        <div class="page-header clearfix">
+        <h2 class="pull-left">Distributors Sales List</h2>
+    </div>
+<?php
 include_once 'db.php';
 
-$result = mysqli_query($conn,"SELECT * FROM ospos_sales");
+$result = mysqli_query($conn, "SELECT * FROM ospos_sales");
 ?>
-                    <?php
+<?php
 if (mysqli_num_rows($result) > 0) {
 ?>
-                    <table class='table table-bordered table-striped'>
-                        <tr>
-                            <td>Sale Date</td>
-                            <td>Sale ID</td>
-                        </tr>
-                        <?php
-$i=0;
-while($row = mysqli_fetch_array($result)) {
+    <table class='table table-bordered table-striped'>
+    <tr>
+        <td>Sale Date</td>
+        <td>Sale ID</td>
+    </tr>
+<?php $i = 0;
+    while ($row = mysqli_fetch_array($result)) {
 ?>
-                        <tr>
-                            <td><?php echo $row["sale_time"]; ?></td>
-                            <td><?php echo $row["sale_id"]; ?></td>
-                        </tr>
-                        <?php
-$i++;
+                    \
+    <tr>
+        <td><?php echo $row["sale_time"]; ?></td>
+        <td><?php echo $row["sale_id"]; ?></td>
+    </tr>
+<?php $i++;
+    }
+?>
+    </table>
+<?php
+}
+else {
+    echo "No result found";
 }
 ?>
-                    </table>
-                    <?php
-}
-else{
-echo "No result found";
-}
-?>
-                </div>
-            </div>
+</div>
+</div>
         </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </body>
 
 </html>

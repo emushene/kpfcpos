@@ -4,28 +4,6 @@ require_once('./application/Secure_Controller.php');
 
 class Reports extends Secure_Controller
 {
-	public function __construct()
-	{
-		parent::__construct('reports');
-
-		$method_name = $this->uri->segment(2);
-		$exploder = explode('_', $method_name);
-
-		if(sizeof($exploder) > 1)
-		{
-			preg_match('/(?:inventory)|([^_.]*)(?:_graph|_row)?$/', $method_name, $matches);
-			preg_match('/^(.*?)([sy])?$/', array_pop($matches), $matches);
-			$submodule_id = $matches[1] . ((count($matches) > 2) ? $matches[2] : 's');
-
-			// check access to report submodule
-			if(!$this->Employee->has_grant('reports_' . $submodule_id, $this->Employee->get_logged_in_employee_info()->person_id))
-			{
-				redirect('no_access/reports/reports_' . $submodule_id);
-			}
-		}
-
-		$this->load->helper('report');
-	}
 
 	
 
@@ -108,51 +86,6 @@ class Reports extends Secure_Controller
 
 		$this->load->view('reports/tabular', $data);
 	}
-
-
-	public function send_pdf($sale_id, $type = 'invoice')
-	{
-		$sale_data = $this->_load_sale_data($sale_id);
-
-		$result = FALSE;
-		$message = $this->lang->line('sales_invoice_no_email');
-
-		if(!empty($sale_data['customer_email']))
-		{
-			$to = $sale_data['customer_email'];
-			$number = $sale_data[$type."_number"];
-			$subject = $this->lang->line("sales_" . $type) . ' ' . $number;
-
-			$text = $this->config->item('invoice_email_message');
-			$tokens = array(new Token_invoice_sequence($sale_data['invoice_number']),
-				new Token_invoice_count('POS ' . $sale_data['sale_id']),
-				new Token_customer((object)$sale_data));
-			$text = $this->token_lib->render($text, $tokens);
-			$sale_data['mimetype'] = get_mime_by_extension('uploads/' . $this->config->item('company_logo'));
-
-			// generate email attachment: invoice in pdf format
-			$html = $this->load->view("sales/" . $type . "_email", $sale_data, TRUE);
-
-			// load pdf helper
-			$this->load->helper(array('dompdf', 'file'));
-			$filename = sys_get_temp_dir() . '/' . $this->lang->line("sales_" . $type) . '-' . str_replace('/', '-', $number) . '.pdf';
-			if(file_put_contents($filename, create_pdf($html)) !== FALSE)
-			{
-				$result = $this->email_lib->sendEmail($to, $subject, $text, $filename);
-			}
-
-			$message = $this->lang->line($result ? "sales_" . $type . "_sent" : "sales_" . $type . "_unsent") . ' ' . $to;
-		}
-
-		echo json_encode(array('success' => $result, 'message' => $message, 'id' => $sale_id));
-
-		$this->sale_lib->clear_all();
-
-		return $result;
-	}
-
-
-
 
 
 }
